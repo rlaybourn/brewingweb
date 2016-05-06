@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+ <!-- http://t.co/dKP3o1e -->
+ <meta name="HandheldFriendly" content="True">
+ <meta name="MobileOptimized" content="320">
+
+ <title>Beer Tracker</title>
+ <meta name="description" content="test">
+<link type="text/css" rel="stylesheet" media="screen and (min-device-width: 800px)" href="{{url_for('static',filename="iot.css")}}" />
+<link type="text/css" rel="stylesheet" media="screen and (max-device-width: 800px)" href="{{url_for('static',filename="iotsm.css")}}" />
+
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+<script type="text/javascript">
+function choosenode(theid)
+{
+    var my_json = "";
+        $.getJSON("{{url_for('getNdata')}}?node="+theid,function(json){
+                my_json =json;
+                $("#Id").text(my_json.Id);
+                 $("#Ip").val(my_json.IP);
+		$("#Name").val(my_json.name);
+		$("#Setpoint").val(my_json.setp);
+                });
+
+
+}
+
+</script>
+</head>
+<body>
+<!--
+<div class='top'>
+ <ul>
+  <li><a href="{{url_for('thelogout')}}">History</a></li>
+  <li><a href="{{url_for('mNodes')}}">Mobile</a></li>
+  <li><a href="{{url_for('theAbout')}}">About</a></li>
+</ul>
+</div>
+ -->
+
+
+<div class='left'>
+Id<br>
+<div id='Id' class='displayer' ></div><br>
+<p>Ip</p>
+<input type="text" id='Ip' class='displayertext' ><br>
+<p>Name</p>
+<input type="text" id='Name' class='displayertext' ><br>
+<p>Setpoint</p>
+<input type='text' id='Setpoint' class='displayertext' ><br>
+
+
+</div>
+<div class='top'>
+ <ul>
+  <li><a href="{{url_for('thelogout')}}">History</a></li>
+  <li><a href="{{url_for('mNodes')}}">Mobile</a></li>
+  <li><a href="{{url_for('theAbout')}}">About</a></li>
+</ul>
+</div>
+
+
+<div class='main'>
+<div class= 'graph'>
+<div class='tabletop'>
+<ul><li class='tt'>Id </li>  <!-- <li class='tt'>  Setpoint </li>-->  <li class='tt'> Name </li> <!-- <li class='tt'>  address</li>--><ul>
+</div>
+
+{% for row in list %}
+    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
+    <li class='tt'> {{ row[2] }}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
+{% endfor %}
+
+</div>
+<button class='button'  name='update' id='updater'>update</button><button class='button'  name='update' id='adder'>Add</button>
+
+</div>
+
+
+
+
+
+</body>

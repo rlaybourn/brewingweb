@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+ <!-- http://t.co/dKP3o1e -->
+ <meta name="HandheldFriendly" content="True">
+ <meta name="MobileOptimized" content="320">
+
+ <title>Beer Tracker</title>
+ <meta name="description" content="test">
+<link type="text/css" rel="stylesheet" href={{url_for('static',filename='iot.css')}} />
+
+<style>
+
+</style>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script src="jquery.csv.min.js"></script>
+ <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+<script type="text/javascript"> // load the visualisation API
+  google.load('visualization', '1', { packages: ['corechart', 'controls'] });
+</script>
+<script type="text/javascript" src={{url_for('static',filename='logscripts.js')}}></script>
+
+<script type="text/javascript">
+/*var data;
+var view;
+var tops;
+var bottoms;
+var mDateSlider;
+var jsonData
+
+function updateSlider(slideAmount) {
+//get the element
+var display = document.getElementById("setpoint");
+//show the amount
+display.innerHTML=slideAmount;
+}
+*/
+function settemp()
+{
+        var display = document.getElementById("setpoint");
+        var level = display.textContent;
+        var wanted = parseFloat(level);
+        //window.alert(wanted);
+        var my_json = "";
+        $.getJSON("dbservice/set",{ temp: wanted},function(json){
+                my_json =json;
+                $("#update").text(json.stat);
+                $("#newwort").text(json.tmp);
+                if(json.stat == "success")
+                {
+                        window.alert("temp set " + json.tmp.toString());
+                }
+        });
+
+         //$("#update").text("doneisn");
+}
+
+
+/*
+function drawVisualization() {
+	var e = document.getElementById("Period");
+	var strUser = e.options[e.selectedIndex].value;
+        var nd = document.getElementById("nodes");
+        var theNode = nd.options[nd.selectedIndex].value;
+ 	console.log("dbservice.py/data?days=" + strUser+"&node=" + theNode);
+       jsonData = $.ajax({
+          //url: "index.py/data",
+	  url: "dbservice/data?days=" + strUser+"&node=" + theNode,
+          dataType:"json",
+          async: false
+          }).responseText;
+      // this new DataTable object holds all the data
+       data = new google.visualization.DataTable(jsonData,0.6);
+	var el = document.getElementById('setp');
+	var am = document.getElementById('amb');
+      view = new google.visualization.DataView(data);
+	var cols = [0,1];
+	if(el.checked)
+	{
+		cols.push(3);
+	}
+	if(am.checked)
+	{
+		cols.push(2);
+	}
+	view.setColumns(cols);
+ // Create a dashboard.
+	 var dash_container = document.getElementById('dashboard_div'),
+   		myDashboard = new google.visualization.Dashboard(dash_container);
+// Create a date range slider
+	myDateSlider = new google.visualization.ControlWrapper({
+	  'controlType': 'DateRangeFilter',
+	  'containerId': 'control_div',
+
+	  'options': {
+	    'filterColumnLabel': 'minutes',
+	     backgroundColor: '#141414'		
+	  }
+	});
+
+      // CAPACITY - En-route ATFM delay - YY - CHART
+      var chart = new google.visualization.ChartWrapper({
+         chartType: 'LineChart',
+         containerId: 'crt_ertdlyYY',
+        options:{
+            width: '90%', height: '80%',
+            title: 'Brewing temperatures-(minutes since midnight)',
+	    curveType: 'function',
+            titleTextStyle : {color: 'grey', fontSize: 11},
+	    backgroundColor: '#E4E4E4',
+            vAxis: { 
+              title: "Temperature", 
+              viewWindowMode:'explicit',
+              viewWindow:{
+                max:30,
+                min:5
+              }
+		
+
+		},
+            
+	    hAxis: {
+		//format: "D HH:mm"
+
+          gridlines: {
+            count: -1,
+            units: {
+              days: {format: ['MMM dd']}//,
+            }
+          },
+          minorGridlines: {
+            units: {
+              hours: {format: ['HH:mm']}//,
+            }
+          }
+		
+	}
+
+         }
+      });
+	
+	myDashboard.bind(myDateSlider,chart);
+	myDashboard.draw(view);
+        var my_json = "";
+        $.getJSON("dbservice/raw",function(json){
+                my_json =json;
+		$("#curitem").text(my_json.wort);
+		 $("#setpoint").text(my_json.setpoint);
+		var input = document.getElementById("skill");
+		input.value = parseFloat(my_json.setpoint)
+		});
+
+ $("#up2").click(function(){
+        $("#up").css("background-color","peru");
+        
+ })
+
+   }
+
+
+
+function redrawVisualization() {
+      // this new DataTable object holds all the data
+       data = new google.visualization.DataTable(jsonData,0.6);
+        var el = document.getElementById('setp');
+        var am = document.getElementById('amb');
+      view = new google.visualization.DataView(data);
+        var cols = [0,1];
+        if(el.checked)
+        {
+                cols.push(3);
+        }
+        if(am.checked)
+        {
+                cols.push(2);
+        }
+        view.setColumns(cols);
+ // Create a dashboard.
+         var dash_container = document.getElementById('dashboard_div'),
+                myDashboard = new google.visualization.Dashboard(dash_container);
+// Create a date range slider 
+ 	var stater =  myDateSlider.getState();
+	tops = stater.highValue;
+	bottoms = stater.lowValue;
+	myDateSlider = new google.visualization.ControlWrapper({
+          'controlType': 'DateRangeFilter',
+          'containerId': 'control_div',
+	'state': {'lowValue': bottoms, 'highValue': tops},
+          'options': {
+            'filterColumnLabel': 'minutes'
+                
+          }
+        });
+
+      // CAPACITY - En-route ATFM delay - YY - CHART
+      var chart = new google.visualization.ChartWrapper({
+         chartType: 'LineChart',
+         containerId: 'crt_ertdlyYY',
+        options:{
+            width: '90%', height: '80%',
+            title: 'Brewing temperatures-(minutes since midnight)',
+            curveType: 'function',
+            titleTextStyle : {color: 'grey', fontSize: 11},
+	    backgroundColor: '#E4E4E4',
+            vAxis: { 
+              title: "Temperature", 
+              viewWindowMode:'explicit',
+              viewWindow:{
+                max:30,
+                min:5
+              }
+            },
+            hAxis: {
+                //format: "D HH:mm"
+
+          gridlines: {
+            count: -1,
+            units: {
+              days: {format: ['MMM dd']}//,
+            }
+          },
+          minorGridlines: {
+            units: {
+              hours: {format: ['HH:mm']}//,
+            }
+          }
+                
+        }
+
+
+         }
+      });
+        
+        myDashboard.bind(myDateSlider,chart);
+        myDashboard.draw(view);
+   }
+
+function drawVisualizationOld() {
+   $.get("logold.csv", function(csvString) {
+      // transform the CSV string into a 2-dimensional array
+      var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+
+      // this new DataTable object holds all the data
+      var data = new google.visualization.arrayToDataTable(arrayData);
+      // CAPACITY - En-route ATFM delay - YY - CHART
+      var crt_ertdlyYY = new google.visualization.ChartWrapper({
+         chartType: 'LineChart',
+         containerId:'yesterday',
+         dataTable: data,
+         options:{
+            width: 850, height: 360,
+            title: 'Brewing temperatures-YESTERDAY',
+            titleTextStyle : {color: 'grey', fontSize: 11},
+         }
+      });
+      crt_ertdlyYY.draw();
+   });
+}
+
+
+google.setOnLoadCallback(drawVisualization)*/
+</script>
+<body> 
+
+
+<div class='left'>
+    <div id="Data Series">Toppings:<br>
+        <label><input type="checkbox" id ="amb" name="ambient" value="a" onClick = "redrawVisualization()"/> ambient</label><br>
+        <label><input type="checkbox" id="setp" name="Set point" value="s" onClick = "redrawVisualization()"/> Set point</label><br>
+    </div><br>
+<select class='button' name="Period" id="Period">
+  <option value="0">1 Day</option>
+  <option value="1" selected>2 Days</option>
+  <option value="2">3 Days</option>
+  <option value="7">1 Week</option>
+</select>
+
+<select class='button' name="nodes" id="nodes">
+ <option value="1">1</option>
+ <option value="2">2</option>
+ <option value="3">3</option>
+
+</select><br>
+ <button class='button' onclick=" drawVisualization()">Refresh</button>
+<br><br>
+Set Point<br>
+<div id='setpoint' class='displayer' ></div>
+Current temp<br>
+<div id='curitem'class='displayer' ></div>
+
+<!--</div>
+<div class='top'>
+ <ul>
+  <li><a href="default.asp">Home</a></li>
+  <li><a href="news.asp">News</a></li>
+  <li><a href="contact.asp">Contact</a></li>
+  <li><a href="about.asp">About</a></li>
+</ul>
+</div>
+-->
+
+</div> <!-- end of top bar -->
+<div class='main'>
+<div  id= "control_div" class='controls'>control</div>
+<div id= "dash_container"></div>
+<div id="crt_ertdlyYY" class='graphsm'></div>
+<button class='button' onclick=settemp() name='update' id='updater'>update</button>
+Required
+<input id="skill" type="range" min="15" max="30" step="0.5" value="0" onchange="updateSlider(this.value)">
+
+
+<!--<div id="yesterday" style="float: left"></div>-->
+</div>
+
+</body>
+<html>

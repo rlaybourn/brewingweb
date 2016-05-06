@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+ <!-- http://t.co/dKP3o1e -->
+ <meta name="HandheldFriendly" content="True">
+ <meta name="MobileOptimized" content="320">
+
+ <title>Beer Tracker</title>
+ <meta name="description" content="test">
+<link type="text/css" rel="stylesheet" href="{{url_for('static',filename="iot.css")}}" />
+</head>
+<body>
+
+<div class='left'>
+left side<br>
+
+</div>
+
+
+<div class='top'>
+<!--<img  class='heads' src="rocks3.jpg">-->
+ <ul>
+  <li><a href="{{url_for('thelogout')}}">History</a></li>
+  <li><a href="{{url_for('mNodes')}}">Nodes</a></li>
+  <li><a href="{{url_for('theAbout')}}">About</a></li>
+
+</ul>
+</div>
+
+
+
+<div class='main'>
+<div class= 'graph'>
+small brewing IOT project
+and stuff
+</div>
+</div>
+
+
+
+
+
+
+
+</body>

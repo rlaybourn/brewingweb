@@ -1,0 +1,181 @@
+
+.button {
+   border: 2px solid #090a0a;
+   background: #7d919e;
+   background: -webkit-gradient(linear, left top, left bottom, from(#535c61), to(#7d919e));
+   background: -webkit-linear-gradient(top, #535c61, #7d919e);
+   background: -moz-linear-gradient(top, #535c61, #7d919e);
+   background: -ms-linear-gradient(top, #535c61, #7d919e);
+   background: -o-linear-gradient(top, #535c61, #7d919e);
+   background-image: -ms-linear-gradient(top, #535c61 0%, #7d919e 100%);
+   padding: 10.5px 21px;
+   -webkit-border-radius: 6px;
+   -moz-border-radius: 6px;
+   border-radius: 6px;
+   -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   text-shadow: #a9b4ba 0 1px 0;
+   color: #343c42;
+   font-size: 14px;
+   font-family: helvetica, serif;
+   text-decoration: none;
+   vertical-align: middle;
+    margin-bottom:20px;
+   margin-top:20px;
+   }
+.button:hover {
+   border: 2px solid #020303;
+   text-shadow: #3e454a 0 1px 0;
+   background:  #709070;/*#929ca3;*/
+   background: -webkit-gradient(linear, left top, left bottom, from( #709070), to(#929ca3));
+   background: -webkit-linear-gradient(top,  #709070,  #90B090);
+   background: -moz-linear-gradient(top,  #709070,#90B090);
+   background: -ms-linear-gradient(top,  #709070, #90B090);
+   background: -o-linear-gradient(top,  #709070, #90B090);
+   background-image: -ms-linear-gradient(top, #6a747a 0%, #929ca3 100%);
+   color: #fff;
+   }
+.button:active {
+   text-shadow: #1e4158 0 1px 0;
+   border: 2px solid #0a3c59;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#929ca3));
+   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+   background: -o-linear-gradient(top, #3e779d, #65a9d7);
+   background-image: -ms-linear-gradient(top, #3e779d 0%, #65a9d7 100%);
+   color: #fff;
+   }
+.top {
+    height: 42px;
+    width: 50%;
+    background-color:#606060;
+    border-radius: 25px;
+    border:4px solid black;
+    text-align:center;
+    margin-bottom:10px;
+    margin: 0 auto;
+}
+.left {
+    border-radius: 25px;
+    border:4px solid black;
+    text-align:center;
+    width: 178px;
+    float:left;
+    background-color:#606060;
+    height: 100%;
+    padding-top: 76px;
+}
+.right {
+    border-radius: 25px;
+    border:4px solid black;
+    text-align:center;
+    width: 178px;
+    float:right;
+    background-color:#606060;
+    height: 100%;
+    display:block;
+    text-align:center;
+    padding-top: 76px;
+
+}
+.graph {
+    margin:auto;
+    border-radius: 2px;
+    border:4px solid black;
+    margin-left:10px;
+    margin-right:190px;
+    margin-top:10px;
+    text-align:center;
+    height:400px;
+    /*width:100%;*/
+}
+.graphsm {
+    margin:auto;
+    border-radius: 2px;
+    border:4px solid black;
+    margin-left:10px;
+    margin-right:5px;
+    margin-top:10px;
+    text-align:center;
+    height:400px;
+    /*width:100%;*/
+}
+.controls {
+    margin:auto;
+    border-radius: 15px;
+    border:4px solid black;
+    margin-top:20px;
+    margin-left:10px;
+    margin-right:190px;
+    text-align:center;
+    background-color:#606060;
+
+}
+
+.main {
+  text-align:center;
+  margin-left:178px;
+  background-color:#404040;
+  height: 100%;
+ }
+.heads{
+ height: 12px;
+ width: 100%;
+}
+.displayer{
+  background-color:#A0A0A0;
+  height: 30px;
+  width: 70px;
+  border-style: solid;
+  margin:auto;
+}
+.inputer{
+  background-color:#707070;
+  height: 30px;
+  width: 70px;
+  border-style: solid;
+}
+.inputer:hover{
+   background-color:#404040;
+  height: 30px;
+  width: 70px;
+  border-style: solid;
+}
+html, body
+{
+    height: 100%;
+    background-color:#404040;
+    text-align: center;
+}
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    margin-right:30px;
+    height:80%;
+    margin-left:20px;
+}
+li {
+    /*display: inline;*/
+    float:left;
+    /*margin-right:10px;*/
+    height:100%;
+
+}
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 4px 26px;
+    text-decoration: none;
+    height:100%;
+    border:2px solid black;
+
+}
+li a:hover {
+    background-color: #709070;
+}
+

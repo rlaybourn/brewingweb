@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+ <!-- http://t.co/dKP3o1e -->
+ <meta name="HandheldFriendly" content="True">
+ <meta name="MobileOptimized" content="320">
+
+ <title>Beer Tracker</title>
+ <meta name="description" content="test">
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='iot.css') }}" />
+<style>
+
+</style>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script src="jquery.csv.min.js"></script>
+ <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+<script type="text/javascript"> // load the visualisation API
+  google.load('visualization', '1', { packages: ['corechart', 'controls'] });
+</script>
+<script type="text/javascript" src={{url_for('static',filename='logscripts.js')}}></script>
+<script type="text/javascript">
+function settemp()
+{
+	var display = document.getElementById("setpoint");
+	var level = display.textContent;
+	var wanted = parseFloat(level);
+        var nd = document.getElementById("nodes");
+        var theNode = nd.options[nd.selectedIndex].value;
+
+	//window.alert(wanted);
+        var my_json = "";
+        $.getJSON("{{url_for('set')}}?node="+theNode,{ temp: wanted},function(json){
+                my_json =json;
+                $("#update").text(json.stat);
+                $("#newwort").text(json.tmp);
+                if(json.stat == "success")
+                {
+                        window.alert("temp set " + json.tmp.toString() + " node:" + theNode);
+                }
+        });
+
+         //$("#update").text("doneisn");
+}
+
+</script>
+<body>
+
+<!--
+<div class='right'>
+Set Point<br>
+<div id='setpoint' class='displayer' ></div>
+Current temp<br>
+<div id='curitem'class='displayer' ></div>
+
+</div>
+-->
+<div class='left'>
+    <div id="Data Series">Toppings:<br>
+        <label><input type="checkbox" id ="amb" name="ambient" value="a" onClick = "redrawVisualization()"/> ambient</label><br>
+        <label><input type="checkbox" id="setp" name="Set point" value="s" onClick = "redrawVisualization()"/> Set point</label><br>
+    </div><br>
+Set Point<br>
+<div id='setpoint' class='displayer' ></div>
+Current temp<br>
+<div id='curitem'class='displayer' ></div>
+
+<select class='button' name="Period" id="Period">
+  <option value="0">1 Day</option>
+  <option value="1" selected>2 Days</option>
+  <option value="2">3 Days</option>
+  <option value="7">1 Week</option>
+</select>
+
+<select class='button' name="nodes" id="nodes">
+ <option value="1">1</option>
+ <option value="2">2</option>
+ <option value="3">3</option>
+
+</select><br>
+ <button class='button' onclick=" drawVisualization()">Refresh</button>
+
+</div>
+
+ 
+<div class='top'>
+<!--<img  class='heads' src="rocks3.jpg">-->
+ <ul>
+  <li><a href="{{url_for('thelogout')}}">History</a></li>
+  <li><a href="{{url_for('mNodes')}}">Nodes</a></li>
+  <li><a href="{{url_for('theAbout')}}">About</a></li>
+</ul> 
+</div>
+
+<div class='main'>
+<div  id= "control_div" class='controls'>control</div>
+<div id= "dash_container"></div>
+<div id="crt_ertdlyYY" class='graph'></div>
+
+<div class='controls'>
+<button class='button' onclick=settemp() name='update' id='updater'>update</button>
+Required
+<input id="skill" type="range" min="15" max="30" step="0.5" value="0" oninput="updateSlider(this.value)">
+</div>
+
+<!--<div id="yesterday" style="float: left"></div>-->
+</div>
+
+</body>
+<html>

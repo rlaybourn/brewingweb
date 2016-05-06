@@ -1,0 +1,30 @@
++-------------------+
+| Tables_in_brewing |
++-------------------+
+| nodes             |
+| templogs          |
++-------------------+
+
+
+describe nodes;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| node_id  | int(11)     | YES  |     | NULL    |       |
+| setpoint | float       | YES  |     | NULL    |       |
+| name     | varchar(50) | YES  |     | NULL    |       |
+| ip       | varchar(50) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+
+ describe templogs;
++----------+----------+------+-----+---------+----------------+
+| Field    | Type     | Null | Key | Default | Extra          |
++----------+----------+------+-----+---------+----------------+
+| itemId   | int(11)  | NO   | PRI | NULL    | auto_increment |
+| wort     | float    | YES  |     | NULL    |                |
+| ambient  | float    | YES  |     | NULL    |                |
+| thetime  | datetime | YES  |     | NULL    |                |
+| node_id  | int(11)  | YES  |     | NULL    |                |
+| setpoint | float    | YES  |     | NULL    |                |
++----------+----------+------+-----+---------+----------------+
+
