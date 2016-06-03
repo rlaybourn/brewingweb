@@ -49,6 +49,7 @@ function drawVisualization() {
         //if ((window.innerWidth <= 800 || window.innerHeight <= 600)) {
         //top.location.href="mobchart.html";
         //}
+	console.log("drawing");
         var e = document.getElementById("Period");
         var strUser = e.options[e.selectedIndex].value;
         var nd = document.getElementById("nodes");
@@ -74,6 +75,8 @@ function drawVisualization() {
         {
                 cols.push(2);
         }
+	cols.push(4);
+	console.log(cols);
         view.setColumns(cols);
  // Create a dashboard.
          var dash_container = document.getElementById('dashboard_div'),
@@ -167,7 +170,7 @@ function redrawVisualization() {
         var el = document.getElementById('setp');
         var am = document.getElementById('amb');
       view = new google.visualization.DataView(data);
-        var cols = [0,1];
+        var cols = [0,1,4];
         if(el.checked)
         {
                 cols.push(3);
@@ -176,6 +179,7 @@ function redrawVisualization() {
         {
                 cols.push(2);
         }
+	console.log(cols);
         view.setColumns(cols);
  // Create a dashboard.
          var dash_container = document.getElementById('dashboard_div'),

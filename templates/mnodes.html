@@ -32,6 +32,26 @@ function choosenode(theid)
 
 }
 
+function updatenode()
+{
+	var thisid = document.getElementById('Id').innerHTML;
+	var thisName = document.getElementById('Name').value;
+	var thisip = document.getElementById('Ip').value;
+	//window.alert(thisid+thisName+thisip);
+	var my_json = "";
+	$.getJSON("{{url_for('updateNode')}}?node="+thisid+"&name="+thisName+"&ip="+thisip,function(json){
+		my_json = json;
+		if(my_json.status == "ok")
+		{
+			window.alert("Done ok");
+			location.reload();
+		}
+		else
+		{
+			window.alert("error"+my_json.status);
+		}
+	});
+}
 </script>
 </head>
 <body>
@@ -79,7 +99,7 @@ Id<br>
 {% endfor %}
 
 </div>
-<button class='button'  name='update' id='updater'>update</button><button class='button'  name='update' id='adder'>Add</button>
+<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button'  name='update' id='adder'>Add</button>
 
 </div>
 

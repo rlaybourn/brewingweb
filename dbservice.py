@@ -50,21 +50,23 @@ def newNode():
 def updateNode():
         try:
                 whichNode = request.args.get("node")
-                if(whichNode == None):
-                        return "non node"
+                newIp = request.args.get("ip")
+                newName = request.args.get("name")
+                if(whichNode == None) or (newIp == None) or (newName == None):
+                        return jsonify(status="error",node= whichNode, IP = newIp) 
         except Exception as e:
                 return str(e)
         try:
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
                 cur.execute("select * from nodes where node_id = 1" )
+                cur.execute("update nodes set ip = \"%s\",name = \"%s\" where node_id = %s" % (newIp , newName,whichNode))
                 cur.close()
+                con.commit()
                 con.close()
         except Exception as e:
                 return str(e)#jsonify(status="dbp")
-#       except Exception as e:
-#               return str(e)
-        return jsonify(status="ok")
+        return jsonify(status="ok",node= whichNode, IP = newIp)
 
 
 @app.route('/delete',methods=['POST','GET'])
@@ -110,7 +112,7 @@ def getNdata():
                         whichNode = 1
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
-                cur.execute("select * from nodes where node_id = %d" % int(whichNode))
+                cur.execute("select node_id,setpoint,name,ip from nodes where node_id = %d" % int(whichNode))
 		res = cur.fetchone()
 		cur.close()
 		con.close()
@@ -202,7 +204,7 @@ def outdata():
 	try:		
         	con = mdb.connect('localhost','root','banaka','brewing')
         	cur = con.cursor()
-        	cur.execute("select wort,ambient,date_format(thetime,'%i'), date_format(thetime,'%H'), date_format(thetime,'%e'),setpoint ,date_format(thetime,'%m')from templogs where thetime > (CURDATE() - interval " + str(period) +" day) and node_id = "+str(whichNode))
+        	cur.execute("select wort,ambient,date_format(thetime,'%i'), date_format(thetime,'%H'), date_format(thetime,'%e'),setpoint ,date_format(thetime,'%m'),inside from templogs where thetime > (CURDATE() - interval " + str(period) +" day) and node_id = "+str(whichNode))
         	res = cur.fetchall()
         	cur.close()
         	con.close()
@@ -211,14 +213,14 @@ def outdata():
 	readingsList = []
 	try:
 		for row in res:
-			numerified = [datetime.datetime(2016,int(row[6]),int(row[4]),int(row[3]),int(row[2])),float(row[0]),float(row[1]),float(row[5])]
+			numerified = [datetime.datetime(2016,int(row[6]),int(row[4]),int(row[3]),int(row[2])),float(row[0]),float(row[1]),float(row[5]),float(row[7])]
 			readingsList.append(numerified)
 				
-		description = [("minutes","datetime"),("wort","number"),("ambient","number"),("setp","number")]
+		description = [("minutes","datetime"),("wort","number"),("ambient","number"),("setp","number"),("inside","number")]
 
 		data_table = gviz_api.DataTable(description)
 		data_table.LoadData(readingsList)
-		return data_table.ToJSon(columns_order=("minutes","wort","ambient","setp"))
+		return data_table.ToJSon(columns_order=("minutes","wort","ambient","setp","inside"))
 	except Exception as e:
 		return "some kidn of error %s" % str(e)
 
