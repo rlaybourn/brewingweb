@@ -35,12 +35,15 @@ def newNode():
 		try:
        	        	con = mdb.connect('localhost','root','banaka','brewing')
  	             	cur = con.cursor()
-                	cur.execute("select * from nodes where node_id = 1" )
+                	cur.execute("select t1.node_id+1 as next from nodes as t1 left join nodes as t2 on t1.node_id+1 = t2.node_id where t2.node_id is null order by t1.node_id limit 1" )
+                        nextnum = cur.fetchone()[0]
+                        cur.execute("insert into nodes (node_id,Ip,name,setpoint) values (%s,\"%s\",\"%s\",%s)" %(nextnum,theIp,theName,theSetpoint))
                 	cur.close()
+                        con.commit()
                 	con.close()
 		except Exception as e:
 			return str(e)#jsonify(status="dbp")
-		return jsonify(status="ok")
+		return jsonify(status="ok",nextid=nextnum)
 	except Exception as e:
 		return str(e)
 		
@@ -80,8 +83,9 @@ def delNode():
 	try:
 		con = mdb.connect('localhost','root','banaka','brewing')
 		cur = con.cursor()
-		cur.execute("select * from nodes where node_id = 1" )
+		cur.execute("delete from nodes where node_id = %s" % whichNode )
 		cur.close()
+                con.commit()
 		con.close()
 	except Exception as e:
 		return str(e)#jsonify(status="dbp")
@@ -124,7 +128,7 @@ def mNodes():
 	try:
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
-                cur.execute("select * from nodes")
+                cur.execute("select * from nodes order by node_id")
                 res = cur.fetchall()
                 cur.close()
                 con.close()

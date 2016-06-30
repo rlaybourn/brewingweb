@@ -52,6 +52,48 @@ function updatenode()
 		}
 	});
 }
+
+function deletenode()
+{
+	var thisid = document.getElementById('Id').innerHTML;
+	var thisName = document.getElementById('Name').value;
+	var thisip = document.getElementById('Ip').value;
+	//window.alert(thisid+thisName+thisip);
+	var my_json = "";
+	$.getJSON("{{url_for('delNode')}}?node="+thisid,function(json){
+		my_json = json;
+		if(my_json.status == "ok")
+		{
+			window.alert("Done ok");
+			location.reload();
+		}
+		else
+		{
+			window.alert("error"+my_json.status);
+		}
+	});
+}
+function addnode()
+{
+	var thisid = document.getElementById('Id').innerHTML;
+	var thisName = document.getElementById('Name').value;
+	var thisip = document.getElementById('Ip').value;
+	var thisSet = document.getElementById('Setpoint').value;
+	//window.alert(thisid+thisName+thisip);
+	var my_json = "";
+	$.getJSON("{{url_for('newNode')}}?name="+thisName+"&Ip="+thisip+"&setp="+thisSet,function(json){
+		my_json = json;
+		if(my_json.status == "ok")
+		{
+			window.alert("Done ok");
+			location.reload();
+		}
+		else
+		{
+			window.alert("error"+my_json.status);
+		}
+	});
+}
 </script>
 </head>
 <body>
@@ -99,7 +141,8 @@ Id<br>
 {% endfor %}
 
 </div>
-<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button'  name='update' id='adder'>Add</button>
+<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
+<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
 
 </div>
 
