@@ -77,9 +77,12 @@ Current temp<br>
 </select>
 
 <select class='button' name="nodes" id="nodes">
- <option value="1">1</option>
+{%for row in list%}
+<option value='{{row[0]}}'>{{row[2]}}</option>
+{% endfor %}
+ <!--option value="1">1</option>
  <option value="2">2</option>
- <option value="3">3</option>
+ <option value="3">3</option>-->
 
 </select><br>
  <button class='button' onclick=" drawVisualization()">Refresh</button>

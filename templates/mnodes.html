@@ -27,6 +27,7 @@ function choosenode(theid)
                  $("#Ip").val(my_json.IP);
 		$("#Name").val(my_json.name);
 		$("#Setpoint").val(my_json.setp);
+		$("#bTime").val(my_json.brewfor);
                 });
 
 
@@ -117,7 +118,8 @@ Id<br>
 <input type="text" id='Name' class='displayertext' ><br>
 <p>Setpoint</p>
 <input type='text' id='Setpoint' class='displayertext' ><br>
-
+<p>Time</p>
+<input type='text' id='bTime' class='displayertext' ><br>
 
 </div>
 <div class='top'>
@@ -137,7 +139,7 @@ Id<br>
 
 {% for row in list %}
     <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
-    <li class='tt'> {{ row[2] }}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
+		    <li class='tt'> {{ row[2] }}  {{row[5]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
 {% endfor %}
 
 </div>

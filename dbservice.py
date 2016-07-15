@@ -71,6 +71,28 @@ def updateNode():
                 return str(e)#jsonify(status="dbp")
         return jsonify(status="ok",node= whichNode, IP = newIp)
 
+@app.route('/start',methods=['POST','GET'])
+def startBrew():
+    try:
+        whichNode = request.args.get("node")
+        if(whichNode == None):
+            return jsonify(status="error",node= whichNode)
+    except Exception as e:
+        return str(e)
+
+    try:
+        con = mdb.connect('localhost','root','banaka','brewing')
+        cur = con.cursor()
+        cur.execute("update nodes set brewstart = now() where node_id = %s" % whichNode)
+        cur.close()
+        con.commit()
+        con.close()
+    except Exception as e:
+        return str(e)#jsonify(status="dbp")
+
+    return jsonify(status="ok",node= whichNode)
+
+
 
 @app.route('/delete',methods=['POST','GET'])
 def delNode():
@@ -116,11 +138,11 @@ def getNdata():
                         whichNode = 1
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
-                cur.execute("select node_id,setpoint,name,ip from nodes where node_id = %d" % int(whichNode))
+                cur.execute("select node_id,setpoint,name,ip,datediff( now() , brewstart) from nodes where node_id = %d" % int(whichNode))
 		res = cur.fetchone()
 		cur.close()
 		con.close()
-		return jsonify(Id = res[0],IP = res[3],name = res[2],setp = res[1])
+		return jsonify(Id = res[0],IP = res[3],name = res[2],setp = res[1],brewfor = res[4])
 	except Exception as e:
 		return str(e)
 @app.route('/mnodes',methods=['POST','GET'])
@@ -128,7 +150,7 @@ def mNodes():
 	try:
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
-                cur.execute("select * from nodes order by node_id")
+                cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
                 res = cur.fetchall()
                 cur.close()
                 con.close()
@@ -154,7 +176,13 @@ def theMob():
 @app.route('/thelog',methods=['POST','GET'])
 def thelogout():
 	try:
-		return render_template('expchart.html', name="rich")
+                con = mdb.connect('localhost','root','banaka','brewing')
+                cur = con.cursor()
+                cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
+                res = cur.fetchall()
+                cur.close()
+                con.close()               
+		return render_template('expchart.html',list=res)
 	except Exception as e:
 		return str(e)
 
