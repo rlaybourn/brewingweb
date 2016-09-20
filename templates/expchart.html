@@ -24,6 +24,25 @@
 </script>
 <script type="text/javascript" src={{url_for('static',filename='logscripts.js')}}></script>
 <script type="text/javascript">
+function logout()
+{
+	try{
+	$.getJSON("{{url_for('logout')}}");
+	}
+	catch(e2)
+	{
+		return
+	}
+	console.log("logged out");
+	window.setTimeout(refresh(),2000);
+	return
+}
+function refresh()
+{
+	console.log("reoad page");
+	window.location.href = 'http://www.google.com';
+	return
+}
 function settemp()
 {
 	var display = document.getElementById("setpoint");
@@ -85,8 +104,8 @@ Current temp<br>
  <option value="3">3</option>-->
 
 </select><br>
- <button class='button' onclick=" drawVisualization()">Refresh</button>
-
+<button class='button' onclick=" drawVisualization()">Refresh</button><br>
+ <a href="{{url_for('logout')}}">logout</a>
 </div>
 
  
@@ -105,9 +124,9 @@ Current temp<br>
 <div id="crt_ertdlyYY" class='graph'></div>
 
 <div class='controls'>
+Required<br>
 <button class='button' onclick=settemp() name='update' id='updater'>update</button>
-Required
-<input id="skill" type="range" min="10" max="30" step="0.5" value="0" oninput="updateSlider(this.value)">
+<input id="skill" class='displayer' type="number" min="5" max="30" step="0.5" value="0" oninput="updateSlider(this.value)">
 </div>
 
 <!--<div id="yesterday" style="float: left"></div>-->

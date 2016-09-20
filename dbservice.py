@@ -11,7 +11,45 @@ import datetime
 import json
 import syslog
 
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.security import Security, SQLAlchemyUserDatastore, \
+            UserMixin, RoleMixin, login_required
+
 app = Flask(__name__)
+app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'super-secret'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+app.config['SECURITY_POST_LOGOUT_VIEW'] = 'thelog'
+
+# Create database connection object
+db = SQLAlchemy(app)
+
+# Define models
+roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,backref=db.backref('users', lazy='dynamic'))
+
+# Setup Flask-Security
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
+
+# Create a user to test with
+@app.before_first_request
+def create_user():
+    db.create_all()
+    user_datastore.create_user(email='earlgrey1979@gmail.com', password='password')
+    db.session.commit()
 
 def get_last_row(csv_filename):
     with open(csv_filename,'rb') as f:
@@ -55,15 +93,25 @@ def updateNode():
                 whichNode = request.args.get("node")
                 newIp = request.args.get("ip")
                 newName = request.args.get("name")
+                newTemp = request.args.get("temp")
                 if(whichNode == None) or (newIp == None) or (newName == None):
                         return jsonify(status="error",node= whichNode, IP = newIp) 
         except Exception as e:
                 return str(e)
         try:
+            if(newTemp == None):
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
                 cur.execute("select * from nodes where node_id = 1" )
                 cur.execute("update nodes set ip = \"%s\",name = \"%s\" where node_id = %s" % (newIp , newName,whichNode))
+                cur.close()
+                con.commit()
+                con.close()
+            else:
+                con = mdb.connect('localhost','root','banaka','brewing')
+                cur = con.cursor()
+                cur.execute("select * from nodes where node_id = 1" )
+                cur.execute("update nodes set ip = \"%s\",name = \"%s\",setpoint = \"%s\" where node_id = %s" % (newIp , newName,newTemp,whichNode))
                 cur.close()
                 con.commit()
                 con.close()
@@ -146,6 +194,7 @@ def getNdata():
 	except Exception as e:
 		return str(e)
 @app.route('/mnodes',methods=['POST','GET'])
+@login_required
 def mNodes():
 	try:
                 con = mdb.connect('localhost','root','banaka','brewing')
@@ -158,10 +207,34 @@ def mNodes():
 	except Exception as e:
 		return str(e)
 
+@app.route('/addaction',methods=['POST','GET'])
+def Action():
+        whichNode = request.args.get("node")
+        days = request.args.get("days")
+        hours = request.args.get("hours")
+        temp = request.args.get("temp")
+        try:
+            con = mdb.connect('localhost','root','banaka','brewing')
+            cur = con.cursor()
+            cur.execute("insert into schedules (node_id,acttime,newtemperature) values (%s,now() + interval %s day,\"%s\")" % (whichNode,days,temp))
+            cur.close()
+            con.commit()
+            con.close()
+            return jsonify(Id=whichNode,status='ok')
+        except Exception as e:
+            return jsonify(Id=whichNode,status=str(e))
+ 
+
 @app.route('/about',methods=['POST','GET'])
 def theAbout():
         try:
-                return render_template('about.html')
+                con = mdb.connect('localhost','root','banaka','brewing')
+                cur = con.cursor()
+                cur.execute("select schedules.node_id,nodes.name,acttime,newtemperature from schedules inner join nodes on schedules.node_id = nodes.node_id order by schedules.acttime")
+                res = cur.fetchall()
+                cur.close()
+                con.close()
+                return render_template('about.html',list=res)
         except Exception as e:
                 return str(e)
 
@@ -172,8 +245,17 @@ def theMob():
         except Exception as e:
                 return str(e)
 
+@app.route('/logout',methods=['POST','GET'])
+def logout():
+    try:
+        flask_security.utils.logout_user()
+        return jsonify(status = "gone")
+    except Exception as e:
+        return str(e);
+
 
 @app.route('/thelog',methods=['POST','GET'])
+@login_required
 def thelogout():
 	try:
                 con = mdb.connect('localhost','root','banaka','brewing')

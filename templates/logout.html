@@ -33,29 +33,6 @@ function choosenode(theid)
 
 }
 
-function startPeriod()
-{
-        var thisid = document.getElementById('Id').innerHTML;
-        var my_json = "";
-	var result = confirm("Want to mark start "+thisid + "?");
-	if(result)
-	{
-		$.getJSON("{{url_for('startBrew')}}?node="+thisid,function(json){
-			my_json = json;
-			if(my_json.status == "ok")
-			{
-				window.alert("Done ok");
-				location.reload();
-			}
-			else
-			{
-				window.alert("error"+my_json.status);
-			}
-		});
-	}
-
-}
-
 function updatenode()
 {
 	var thisid = document.getElementById('Id').innerHTML;
@@ -134,43 +111,23 @@ function addnode()
 
 
 <div class='left'>
-Id<br>
-<div id='Id' class='displayer' ></div><br>
-<p>Ip</p>
-<input type="text" id='Ip' class='displayertext' ><br>
-<p>Name</p>
-<input type="text" id='Name' class='displayertext' ><br>
-<p>Setpoint</p>
-<input type='text' id='Setpoint' class='displayertext' ><br>
-<p>Time</p>
-<input type='text' id='bTime' class='displayertext' ><br>
 
 </div>
 <div class='top'>
  <ul>
   <li><a href="{{url_for('thelogout')}}">History</a></li>
-  <li><a href="{{url_for('theAbout')}}">Schedule</a></li>
+  <li><a href="{{url_for('mNodes')}}">Manage</a></li>
+  <li><a href="{{url_for('theAbout')}}">About</a></li>
 </ul>
 </div>
 
 
 <div class='main'>
-<div class= 'graph'>
-<div class='tabletop'>
-<ul><li class='tt'>Id </li>  <!-- <li class='tt'>  Setpoint </li>-->  <li class='tt'> Name </li> <!-- <li class='tt'>  address</li>--><ul>
+	<H1> Goodbye </H1>
 </div>
 
-{% for row in list %}
-    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
-		    <li class='tt'> {{ row[2] }}  {{row[5]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
-{% endfor %}
 
-</div>
-<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
-<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button><br>
-<button class='button'  onclick=startPeriod() name='update' id='adder'>Start</button>
 
-</div>
 
 
 

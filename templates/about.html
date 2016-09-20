@@ -11,36 +11,141 @@
 
  <title>Beer Tracker</title>
  <meta name="description" content="test">
-<link type="text/css" rel="stylesheet" href="{{url_for('static',filename="iot.css")}}" />
+<link type="text/css" rel="stylesheet" media="screen and (min-device-width: 800px)" href="{{url_for('static',filename="iot.css")}}" />
+<link type="text/css" rel="stylesheet" media="screen and (max-device-width: 800px)" href="{{url_for('static',filename="iotsm.css")}}" />
+
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+<script type="text/javascript">
+function choosenode(theid)
+{
+    var my_json = "";
+        $.getJSON("{{url_for('getNdata')}}?node="+theid,function(json){
+                my_json =json;
+                $("#Id").text(my_json.Id);
+                 $("#Ip").val(my_json.IP);
+		$("#Name").val(my_json.name);
+		$("#Setpoint").val(my_json.setp);
+		$("#bTime").val(my_json.brewfor);
+                });
+
+
+}
+
+function updatenode()
+{
+	var thisid = document.getElementById('Id').innerHTML;
+	var thisName = document.getElementById('Name').value;
+	var thisip = document.getElementById('Ip').value;
+	var thistp = document.getElementById('Setpoint').value;
+	//window.alert(thisid+thisName+thisip);
+	var my_json = "";
+	$.getJSON("{{url_for('updateNode')}}?node="+thisid+"&name="+thisName+"&ip="+thisip+"&temp="+thistp,function(json){
+		my_json = json;
+		if(my_json.status == "ok")
+		{
+			window.alert("Done ok");
+			location.reload();
+		}
+		else
+		{
+			window.alert("error"+my_json.status);
+		}
+	});
+}
+
+function deletenode()
+{
+	var thisid = document.getElementById('Id').innerHTML;
+	var thisName = document.getElementById('Name').value;
+	var thisip = document.getElementById('Ip').value;
+	//window.alert(thisid+thisName+thisip);
+	var my_json = "";
+	$.getJSON("{{url_for('delNode')}}?node="+thisid,function(json){
+		my_json = json;
+		if(my_json.status == "ok")
+		{
+			window.alert("Done ok");
+			location.reload();
+		}
+		else
+		{
+			window.alert("error"+my_json.status);
+		}
+	});
+}
+function addnode()
+{
+	var thisid = document.getElementById('Id').innerHTML;
+	var thisName = document.getElementById('Name').value;
+	var thisip = document.getElementById('Ip').value;
+	var thisSet = document.getElementById('Setpoint').value;
+	//window.alert(thisid+thisName+thisip);
+	var my_json = "";
+	$.getJSON("{{url_for('newNode')}}?name="+thisName+"&Ip="+thisip+"&setp="+thisSet,function(json){
+		my_json = json;
+		if(my_json.status == "ok")
+		{
+			window.alert("Done ok");
+			location.reload();
+		}
+		else
+		{
+			window.alert("error"+my_json.status);
+		}
+	});
+}
+</script>
 </head>
 <body>
-
-<div class='left'>
-left side<br>
-
-</div>
-
-
+<!--
 <div class='top'>
-<!--<img  class='heads' src="rocks3.jpg">-->
  <ul>
   <li><a href="{{url_for('thelogout')}}">History</a></li>
-  <li><a href="{{url_for('mNodes')}}">Nodes</a></li>
+  <li><a href="{{url_for('mNodes')}}">Mobile</a></li>
   <li><a href="{{url_for('theAbout')}}">About</a></li>
+</ul>
+</div>
+ -->
 
+
+<div class='left'>
+Id<br>
+<div id='Id' class='displayer' ></div><br>
+<p>Name</p>
+<input type="text" id='Name' class='displayertext' ><br>
+<p>Setpoint</p>
+<input type='text' id='Setpoint' class='displayertext' ><br>
+<p>Time</p>
+<input type='text' id='bTime' class='displayertext' ><br>
+
+</div>
+<div class='top'>
+ <ul>
+  <li><a href="{{url_for('thelogout')}}">History</a></li>
+  <li><a href="{{url_for('mNodes')}}">Manage</a></li>
+  <li><a href="{{url_for('theAbout')}}">About</a></li>
 </ul>
 </div>
 
 
-
 <div class='main'>
 <div class= 'graph'>
-small brewing IOT project
-and stuff
-</div>
+<div class='tabletop'>
+<ul><li class='tt'>Id </li>  <!-- <li class='tt'>  Setpoint </li>-->  <li class='tt'> Name </li> <!-- <li class='tt'>  address</li>--><ul>
 </div>
 
+{% for row in list %}
+    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
+		    <li class='tt'> {{ row[1] }}  {{row[3]}} {{row[2]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
+{% endfor %}
 
+</div>
+<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
+<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
+
+</div>
 
 
 
