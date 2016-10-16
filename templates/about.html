@@ -33,15 +33,15 @@ function choosenode(theid)
 
 }
 
-function updatenode()
+function additem()
 {
-	var thisid = document.getElementById('Id').innerHTML;
-	var thisName = document.getElementById('Name').value;
-	var thisip = document.getElementById('Ip').value;
-	var thistp = document.getElementById('Setpoint').value;
+	var nodeid = document.getElementById('node').value;
+	var thisSetpoint = document.getElementById('Setpoint').value;
+	var thisdays = document.getElementById('days').value;
+	var thishours = document.getElementById('hours').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
-	$.getJSON("{{url_for('updateNode')}}?node="+thisid+"&name="+thisName+"&ip="+thisip+"&temp="+thistp,function(json){
+	$.getJSON("{{url_for('Action')}}?node="+nodeid+"&days="+thisdays+"&hours="+thishours+"&temp="+thisSetpoint,function(json){
 		my_json = json;
 		if(my_json.status == "ok")
 		{
@@ -113,12 +113,15 @@ function addnode()
 <div class='left'>
 Id<br>
 <div id='Id' class='displayer' ></div><br>
-<p>Name</p>
-<input type="text" id='Name' class='displayertext' ><br>
+<p>Node</p>
+<input type="text" id='node' class='displayertext' ><br>
 <p>Setpoint</p>
 <input type='text' id='Setpoint' class='displayertext' ><br>
-<p>Time</p>
-<input type='text' id='bTime' class='displayertext' ><br>
+<p>Days</p>
+<input type='text' id='days' class='displayertext' ><br>
+<p>Hours</p>
+<input type='text' id='hours' class='displayertext' ><br>
+
 
 </div>
 <div class='top'>
@@ -138,11 +141,11 @@ Id<br>
 
 {% for row in list %}
     <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
-		    <li class='tt'> {{ row[1] }}  {{row[3]}} {{row[2]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
+		    <li class='tt'>{{row[4]}} {{ row[1] }}  {{row[3]}} {{row[2]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
 {% endfor %}
 
 </div>
-<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
+<button class='button'  onclick=additem() name='update' id='updater'>add</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
 <button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
 
 </div>

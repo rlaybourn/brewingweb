@@ -193,6 +193,19 @@ def getNdata():
 		return jsonify(Id = res[0],IP = res[3],name = res[2],setp = res[1],brewfor = res[4])
 	except Exception as e:
 		return str(e)
+@app.route("/deldata",methods=['POST','GET'])
+def delSdata():
+    try:
+        whichItem =  request.args.get("uid")
+        con = mdb.connect('localhost','root','banaka','brewing')
+        cur = con.cursor()
+        cur.execute("delete from schedules where uid = %s" % whichItem)
+        cur.commit()
+        cur.close()
+        return jsonify(status = "ok")
+    except Exception as e:
+        return jsonify(status = str(e))
+
 @app.route('/mnodes',methods=['POST','GET'])
 @login_required
 def mNodes():
@@ -222,7 +235,7 @@ def Action():
             con.close()
             return jsonify(Id=whichNode,status='ok')
         except Exception as e:
-            return jsonify(Id=whichNode,status=str(e))
+            return jsonify(Id=whichNode,status="insert into schedules (node_id,acttime,newtemperature) values (%s,now() + interval %s day,\"%s\")" % (whichNode,days,temp))
  
 
 @app.route('/about',methods=['POST','GET'])
@@ -230,7 +243,7 @@ def theAbout():
         try:
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
-                cur.execute("select schedules.node_id,nodes.name,acttime,newtemperature from schedules inner join nodes on schedules.node_id = nodes.node_id order by schedules.acttime")
+                cur.execute("select schedules.node_id,nodes.name,acttime,newtemperature,uid from schedules inner join nodes on schedules.node_id = nodes.node_id order by schedules.acttime")
                 res = cur.fetchall()
                 cur.close()
                 con.close()
