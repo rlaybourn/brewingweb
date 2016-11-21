@@ -229,7 +229,7 @@ def Action():
         try:
             con = mdb.connect('localhost','root','banaka','brewing')
             cur = con.cursor()
-            cur.execute("insert into schedules (node_id,acttime,newtemperature) values (%s,now() + interval %s day,\"%s\")" % (whichNode,days,temp))
+            cur.execute("insert into schedules (node_id,acttime,newtemperature,completed) values (%s,now() + interval %s day + interval %s hour,\"%s\",false)" % (whichNode,days,hours,temp))
             cur.close()
             con.commit()
             con.close()
@@ -243,11 +243,16 @@ def theAbout():
         try:
                 con = mdb.connect('localhost','root','banaka','brewing')
                 cur = con.cursor()
-                cur.execute("select schedules.node_id,nodes.name,acttime,newtemperature,uid from schedules inner join nodes on schedules.node_id = nodes.node_id order by schedules.acttime")
+                cur.execute("select schedules.node_id,nodes.name,acttime,newtemperature,uid from schedules inner join nodes on schedules.node_id = nodes.node_id where schedules.completed = false order by schedules.acttime")
                 res = cur.fetchall()
+                cur.execute("select node_id, name from nodes")
+                nodelist = cur.fetchall()
                 cur.close()
                 con.close()
-                return render_template('about.html',list=res)
+                #nodelist = [1,2]
+                thelist = list(nodelist)
+                thelist.insert(0,[0,"none"])
+                return render_template('about.html',list=res,allnodes=thelist)
         except Exception as e:
                 return str(e)
 
@@ -299,6 +304,21 @@ def rawdata():
 		return jsonify(wort = res[0],ambient = res[1],setpoint = res[2])
 	except Exception as e:
 		return str(e)
+@app.route('/nodelist',methods=['POST','GET'])
+def nodeList():
+    try:
+        con = mdb.connect('localhost','root','banaka','brewing')
+        cur = con.cursor()
+        cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
+        res = cur.fetchall()
+        cur.close()
+        con.close()
+        thelist = []
+        for item in res:
+            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5]})
+        return jsonify(nodes = thelist)
+    except Exception as e:
+        return str(e)
 
 @app.route('/set', methods=['POST','GET'])
 def set():

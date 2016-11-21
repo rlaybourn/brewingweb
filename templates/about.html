@@ -96,6 +96,12 @@ function addnode()
 		}
 	});
 }
+function copyover()
+{
+	var theNode = document.getElementById('nodes').value;
+	document.getElementById('node').value = theNode;
+	
+}
 </script>
 </head>
 <body>
@@ -115,6 +121,14 @@ Id<br>
 <div id='Id' class='displayer' ></div><br>
 <p>Node</p>
 <input type="text" id='node' class='displayertext' ><br>
+
+<select class='button' name="nodes" id="nodes" onchange="copyover()">
+	{%for row in allnodes%}
+	<option value='{{row[0]}}'>{{row[1]}}</option>
+	{% endfor %}
+</select><br>
+
+
 <p>Setpoint</p>
 <input type='text' id='Setpoint' class='displayertext' ><br>
 <p>Days</p>
@@ -140,7 +154,7 @@ Id<br>
 </div>
 
 {% for row in list %}
-    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
+    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[4]}} onclick=choosenode({{row[4]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
 		    <li class='tt'>{{row[4]}} {{ row[1] }}  {{row[3]}} {{row[2]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
 {% endfor %}
 

@@ -33,6 +33,54 @@ function choosenode(theid)
 
 }
 
+function addNodeEntry()
+{
+	var my_json = "";
+	$.getJSON("{{url_for('nodeList')}}",function(json){
+		my_json =json;
+		var thenodes = my_json.nodes;
+		console.log("got nodes");
+		console.log(thenodes);
+		var listnode = document.getElementById('tt');
+		while (listnode.firstChild) {
+	    		listnode.removeChild(listnode.firstChild);
+		}
+		for(i=0; i < thenodes.length; i++)
+		{
+			console.log(thenodes[i].ID);
+			var element = document.createElement("div");
+			var listel = document.createElement("ul");
+			var inlist = document.createElement("li")
+			inlist.appendChild(document.createTextNode(thenodes[i].NAME));
+			listel.appendChild(inlist);
+			element.appendChild(listel);
+			element.className = "listodd";
+			element.id = thenodes[i].ID;
+			//element.addEventListener("click", choosenode(1), false);
+			//element.onclick = choosenode;
+			element.setAttribute("onclick", "choosenode(" + thenodes[i].ID +")");
+			inlist.className = "tt";
+			//element.appendChild(document.createTextNode('new stuff'));
+			document.getElementById('tt').appendChild(element);
+		}
+	});
+	/*var element = document.createElement("div");
+	var listel = document.createElement("ul");
+	var inlist = document.createElement("li")
+	inlist.appendChild(document.createTextNode('new stuff'));
+	listel.appendChild(inlist);
+	element.appendChild(listel);
+	element.className = "listodd";
+	element.id = "2";
+	//element.addEventListener("click", choosenode(1), false);
+	//element.onclick = choosenode;
+	element.setAttribute("onclick", "choosenode(1)");
+	inlist.className = "tt";
+	//element.appendChild(document.createTextNode('new stuff'));
+	document.getElementById('tt').appendChild(element);*/
+}
+
+
 function startPeriod()
 {
         var thisid = document.getElementById('Id').innerHTML;
@@ -90,7 +138,8 @@ function deletenode()
 		if(my_json.status == "ok")
 		{
 			window.alert("Done ok");
-			location.reload();
+			//location.reload();
+			addNodeEntry();
 		}
 		else
 		{
@@ -111,7 +160,8 @@ function addnode()
 		if(my_json.status == "ok")
 		{
 			window.alert("Done ok");
-			location.reload();
+			//location.reload();
+			addNodeEntry();
 		}
 		else
 		{
@@ -155,21 +205,18 @@ Id<br>
 
 
 <div class='main'>
-<div class= 'graph'>
-<div class='tabletop'>
+<div class= 'graph' id='tt'>
+<div class='tabletop' id='ta'>
 <ul><li class='tt'>Id </li>  <!-- <li class='tt'>  Setpoint </li>-->  <li class='tt'> Name </li> <!-- <li class='tt'>  address</li>--><ul>
 </div>
-
-{% for row in list %}
-    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[0]}} onclick=choosenode({{row[0]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
-		    <li class='tt'> {{ row[2] }}  {{row[5]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
-{% endfor %}
-
+<script>
+addNodeEntry();
+</script>
 </div>
 <button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
 <button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button><br>
 <button class='button'  onclick=startPeriod() name='update' id='adder'>Start</button>
-
+<button class='button'  onclick=addNodeEntry() name='update' id='adder'>addnode</button>
 </div>
 
 
