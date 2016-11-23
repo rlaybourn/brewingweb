@@ -11,6 +11,8 @@
 
  <title>Beer Tracker</title>
  <meta name="description" content="test">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
 <link type="text/css" rel="stylesheet" media="screen and (min-device-width: 800px)" href="{{url_for('static',filename="iot.css")}}" />
 <link type="text/css" rel="stylesheet" media="screen and (max-device-width: 800px)" href="{{url_for('static',filename="iotsm.css")}}" />
 
@@ -20,6 +22,7 @@
 <script type="text/javascript">
 function choosenode(theid)
 {
+	console.log("choosenode " + theid);
     var my_json = "";
         $.getJSON("{{url_for('getNdata')}}?node="+theid,function(json){
                 my_json =json;
@@ -32,6 +35,64 @@ function choosenode(theid)
 
 
 }
+
+function chooseitem(theid)
+{
+	console.log("chooseitem " + theid);
+    var my_json = "";
+        $.getJSON("{{url_for('getSdata')}}?node="+theid,function(json){
+                my_json =json;
+                $("#Id").text(my_json.uid);
+                 //$("#Ip").val(my_json.IP);
+		//$("#Name").val(my_json.name);
+		$("#Setpoint").val(my_json.temp);
+		//$("#bTime").val(my_json.brewfor);
+                });
+
+
+}
+
+
+
+
+function readitems()
+{
+	var my_json = "";
+        $.getJSON("{{url_for('schedulelist')}}",function(json){
+		my_json =json;
+		var numberofitems = parseInt(my_json.items);
+		if(numberofitems > 0)
+		{
+			//window.alert("have items "+my_json.items);
+			var noticeboard = document.getElementById('board');
+			theitems = my_json.item;
+			for(i=0; i < theitems.length; i++)
+			{
+				var element = document.createElement("div");
+				var listel = document.createElement("ul");
+				var inlist = document.createElement("li");
+				var light = document.createElement("div");
+
+				inlist.appendChild(document.createTextNode(theitems[i].name + "  : "+theitems[i].time + " New temp: " + theitems[i].temp));
+				inlist.className = "tt";
+				listel.appendChild(inlist);
+				element.appendChild(listel);
+				element.className = "listodd";
+				element.id = theitems[i].uid;
+				element.setAttribute("onclick", "chooseitem(" + theitems[i].uid +")");
+
+				noticeboard.appendChild(element);
+			}
+
+			
+		}
+		else
+		{
+			window.alert("nothing to do");
+		}
+	});
+}
+
 
 function additem()
 {
@@ -46,7 +107,8 @@ function additem()
 		if(my_json.status == "ok")
 		{
 			window.alert("Done ok");
-			location.reload();
+			//location.reload();
+			readitems();
 		}
 		else
 		{
@@ -58,11 +120,11 @@ function additem()
 function deletenode()
 {
 	var thisid = document.getElementById('Id').innerHTML;
-	var thisName = document.getElementById('Name').value;
-	var thisip = document.getElementById('Ip').value;
+	//var thisName = document.getElementById('Name').value;
+	//var thisip = document.getElementById('Ip').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
-	$.getJSON("{{url_for('delNode')}}?node="+thisid,function(json){
+	$.getJSON("{{url_for('delSdata')}}?uid="+thisid,function(json){
 		my_json = json;
 		if(my_json.status == "ok")
 		{
@@ -102,6 +164,9 @@ function copyover()
 	document.getElementById('node').value = theNode;
 	
 }
+
+readitems();
+
 </script>
 </head>
 <body>
@@ -148,23 +213,18 @@ Id<br>
 
 
 <div class='main'>
-<div class= 'graph'>
+<div class= 'graph' id='board'>
 <div class='tabletop'>
 <ul><li class='tt'>Id </li>  <!-- <li class='tt'>  Setpoint </li>-->  <li class='tt'> Name </li> <!-- <li class='tt'>  address</li>--><ul>
 </div>
 
-{% for row in list %}
-    <div class={{loop.cycle('listodd', 'listeven')}} id={{row[4]}} onclick=choosenode({{row[4]}})><ul><!--<li class='tt'>{{ row[0] }}</li><li class='tt'>  {{ row[1] }}</li> -->
-		    <li class='tt'>{{row[4]}} {{ row[1] }}  {{row[3]}} {{row[2]}}</li> <!--<li class='tt'>  {{ row[3] }}</li>--></ul></div>
-{% endfor %}
 
 </div>
-<button class='button'  onclick=additem() name='update' id='updater'>add</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
+<button class='button'  onclick=additem() name='update' id='updater'>Add</button>
 <button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
+<button class='button'  onclick=readitems() name='update' id='adder'>Refresh</button>
 
 </div>
-
-
 
 
 

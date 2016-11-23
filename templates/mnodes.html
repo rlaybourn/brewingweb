@@ -11,12 +11,12 @@
 
  <title>Beer Tracker</title>
  <meta name="description" content="test">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link type="text/css" rel="stylesheet" media="screen and (min-device-width: 800px)" href="{{url_for('static',filename="iot.css")}}" />
 <link type="text/css" rel="stylesheet" media="screen and (max-device-width: 800px)" href="{{url_for('static',filename="iotsm.css")}}" />
-
  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 function choosenode(theid)
 {
@@ -28,8 +28,16 @@ function choosenode(theid)
 		$("#Name").val(my_json.name);
 		$("#Setpoint").val(my_json.setp);
 		$("#bTime").val(my_json.brewfor);
+		$("#NodeInfoModal").modal("show");
+                $("#Idm").text(my_json.Id);
+                 $("#Ipm").val(my_json.IP);
+		$("#Namem").val(my_json.name);
+		$("#Setpointm").val(my_json.setp);
+		$("#Timem").val(my_json.brewfor);
+		$("#NodeInfoModal").modal("show");
+		console.log("choose");
                 });
-
+	
 
 }
 
@@ -50,8 +58,11 @@ function addNodeEntry()
 			console.log(thenodes[i].ID);
 			var element = document.createElement("div");
 			var listel = document.createElement("ul");
-			var inlist = document.createElement("li")
-			inlist.appendChild(document.createTextNode(thenodes[i].NAME));
+			var inlist = document.createElement("li");
+			var light = document.createElement("div");
+			element.style.backgroundColor = '#008811';
+			inlist.appendChild(document.createTextNode(thenodes[i].NAME + "  current: "+thenodes[i].WORT));
+			//inlist.appendChild(light);
 			listel.appendChild(inlist);
 			element.appendChild(listel);
 			element.className = "listodd";
@@ -106,10 +117,10 @@ function startPeriod()
 
 function updatenode()
 {
-	var thisid = document.getElementById('Id').innerHTML;
-	var thisName = document.getElementById('Name').value;
-	var thisip = document.getElementById('Ip').value;
-	var thistp = document.getElementById('Setpoint').value;
+	var thisid = document.getElementById('Idm').innerHTML;
+	var thisName = document.getElementById('Namem').value;
+	var thisip = document.getElementById('Ipm').value;
+	var thistp = document.getElementById('Setpointm').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
 	$.getJSON("{{url_for('updateNode')}}?node="+thisid+"&name="+thisName+"&ip="+thisip+"&temp="+thistp,function(json){
@@ -117,13 +128,15 @@ function updatenode()
 		if(my_json.status == "ok")
 		{
 			window.alert("Done ok");
-			location.reload();
+			//location.reload();
 		}
 		else
 		{
 			window.alert("error"+my_json.status);
 		}
 	});
+	$("#NodeInfoModal").modal("hide");
+	addNodeEntry();
 }
 
 function deletenode()
@@ -149,10 +162,10 @@ function deletenode()
 }
 function addnode()
 {
-	var thisid = document.getElementById('Id').innerHTML;
-	var thisName = document.getElementById('Name').value;
-	var thisip = document.getElementById('Ip').value;
-	var thisSet = document.getElementById('Setpoint').value;
+	var thisid = document.getElementById('Idn').innerHTML;
+	var thisName = document.getElementById('Namen').value;
+	var thisip = document.getElementById('Ipn').value;
+	var thisSet = document.getElementById('Setpointn').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
 	$.getJSON("{{url_for('newNode')}}?name="+thisName+"&Ip="+thisip+"&setp="+thisSet,function(json){
@@ -176,7 +189,7 @@ function addnode()
 <div class='top'>
  <ul>
   <li><a href="{{url_for('thelogout')}}">History</a></li>
-  <li><a href="{{url_for('mNodes')}}">Mobile</a></li>
+  <li><a href="{{url_for('mNodes')}}">Manage</a></li>
   <li><a href="{{url_for('theAbout')}}">About</a></li>
 </ul>
 </div>
@@ -199,6 +212,7 @@ Id<br>
 <div class='top'>
  <ul>
   <li><a href="{{url_for('thelogout')}}">History</a></li>
+  <li><a href="{{url_for('mNodes')}}">Manage</a></li>
   <li><a href="{{url_for('theAbout')}}">Schedule</a></li>
 </ul>
 </div>
@@ -212,11 +226,70 @@ Id<br>
 <script>
 addNodeEntry();
 </script>
+
 </div>
-<button class='button'  onclick=updatenode() name='update' id='updater'>update</button><button class='button' onclick=addnode() name='update' id='adder'>Add</button>
+
+  <!-- Modal -->
+<div class="modal fade" id="NodeInfoModal" role="dialog">
+	  <div class="modal-dialog">
+		  <div class="modal-content">
+
+		  <div class="modal-header">
+			  <H2>Node Data</H2>
+		  </div>
+			  <div class="modal-body">
+				  Id<br><div id='Idm' class='displayer' ></div><br>
+				  Ip<br><input type="text" id='Ipm' class='displayertext' ><br>
+				  Name<br><input type="text" id='Namem' class='displayertext' ><br>
+				  Setpoint<br><input type='text' id='Setpointm' class='displayertext' ><br>
+				  Time<br><input type='text' id='Timem' class='displayertext' ><br>
+
+			  </div>
+		
+		<div class="modal-footer">
+		  <button type="button" class="button" data-dismiss="modal">Close</button>
+		  <button type="button" class="button"  onclick=updatenode()>Update</button>
+		  <button class='button'  onclick=startPeriod() name='update' id='adder'>Start</button>
+		<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
+		</div>
+		  </div>
+	  </div>
+ </div>
+
+
+
+
+  <!-- Modal -->
+<div class="modal fade" id="newNodeModal" role="dialog">
+	  <div class="modal-dialog">
+		  <div class="modal-content">
+
+		  <div class="modal-header">
+			  <H2>Create Node</H2>
+		  </div>
+			  <div class="modal-body">
+				  Id<br><div id='Idn' class='displayer' ></div><br>
+				  Ip<br><input type="text" id='Ipn' class='displayertext' ><br>
+				  Name<br><input type="text" id='Namen' class='displayertext' ><br>
+				  Setpoint<br><input type='text' id='Setpointn' class='displayertext' ><br>
+				  Time<br><input type='text' id='Timen' class='displayertext' ><br>
+
+			  </div>
+		
+		<div class="modal-footer">
+		  <button type="button" class="button" data-dismiss="modal">Cancel</button>
+		  <button type="button" class="button" onclick=addnode()>Create</button>
+		</div>
+		  </div>
+	  </div>
+ </div>
+ <button type="button" class="button" data-toggle="modal" data-target="#newNodeModal">New Node</button> 
+
+<button class='button'  onclick=updatenode() name='update' id='updater'>Update</button>
+<button class='button' onclick=addnode() name='update' id='adder'>Add</button>
 <button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button><br>
 <button class='button'  onclick=startPeriod() name='update' id='adder'>Start</button>
-<button class='button'  onclick=addNodeEntry() name='update' id='adder'>addnode</button>
+<button class='button'  onclick=addNodeEntry() name='update' id='adder'>Refresh</button>
 </div>
 
 

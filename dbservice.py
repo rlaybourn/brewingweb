@@ -76,6 +76,7 @@ def newNode():
                 	cur.execute("select t1.node_id+1 as next from nodes as t1 left join nodes as t2 on t1.node_id+1 = t2.node_id where t2.node_id is null order by t1.node_id limit 1" )
                         nextnum = cur.fetchone()[0]
                         cur.execute("insert into nodes (node_id,Ip,name,setpoint) values (%s,\"%s\",\"%s\",%s)" %(nextnum,theIp,theName,theSetpoint))
+                        cur.execute("insert into templogs (node_id,setpoint,thetime) values(%s,0,now())"%(nextnum))
                 	cur.close()
                         con.commit()
                 	con.close()
@@ -178,6 +179,24 @@ def getjson():
 		return jsonify(status="ok",time = str(datetime.datetime.now()))
 	except Exception as e:
 		return str(e)
+
+@app.route('/sdata',methods=['POST','GET'])
+def getSdata():
+    try:
+        whichNode = request.args.get("node")
+        if(whichNode == None):
+            return jsonify(items = 0)
+        con = mdb.connect('localhost','root','banaka','brewing')
+        cur = con.cursor()
+        cur.execute("select node_id,newtemperature,uid from schedules where uid = %d" % int(whichNode))
+        res = cur.fetchone()
+        cur.close()
+        con.close()
+        return jsonify(Id = res[0],temp = res[1],uid = res[2],items = len(res))
+    except Exception as e:
+        return str(e)
+
+
 @app.route('/ndata',methods=['POST','GET'])
 def getNdata():
 	try:
@@ -200,8 +219,9 @@ def delSdata():
         con = mdb.connect('localhost','root','banaka','brewing')
         cur = con.cursor()
         cur.execute("delete from schedules where uid = %s" % whichItem)
-        cur.commit()
+        con.commit()
         cur.close()
+        con.close()
         return jsonify(status = "ok")
     except Exception as e:
         return jsonify(status = str(e))
@@ -309,17 +329,36 @@ def nodeList():
     try:
         con = mdb.connect('localhost','root','banaka','brewing')
         cur = con.cursor()
-        cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
+#        cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
+#        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),templogs.wort,templogs.thetime from nodes join templogs on nodes.node_id = templogs.node_id order by itemId desc limit 1")
+        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),t3.wort,t3.thetime from nodes join (select * from templogs join (select node_id id,max(thetime) timestamp from templogs group by node_id) t2 on templogs.thetime = t2.timestamp) t3 on t3.id = nodes.node_id order by nodes.node_id") 
         res = cur.fetchall()
         cur.close()
         con.close()
         thelist = []
         for item in res:
-            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5]})
+            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5],'WORT' : item[6]})
         return jsonify(nodes = thelist)
     except Exception as e:
         return str(e)
-
+@app.route('/schedulelist',methods=['POST','GET'])
+def schedulelist():
+    try:
+        con = mdb.connect('localhost','root','banaka','brewing')
+        cur = con.cursor()
+        cur.execute("select schedules.node_id,nodes.name,acttime,newtemperature,uid from schedules inner join nodes on schedules.node_id = nodes.node_id where schedules.completed = false order by schedules.acttime")
+        res = cur.fetchall()
+        #cur.execute("select node_id, name from nodes")
+        #nodelist = cur.fetchall()
+        cur.close()
+        con.close()
+        thelist = []
+        for item in res:
+            thelist.append({'node' : item[0],'name' : item[1],'time' : item[2],'temp' : item[3],'uid' : item[4]})
+        return jsonify(item = thelist,items = len(res))
+    except Exception as e:
+        return str(e)
+    
 @app.route('/set', methods=['POST','GET'])
 def set():
 	wated = float(request.args.get('temp'))
