@@ -20,6 +20,8 @@
 <script type="text/javascript">
 function choosenode(theid)
 {
+	$("#NodeInfoModal").modal("show");
+
     var my_json = "";
         $.getJSON("{{url_for('getNdata')}}?node="+theid,function(json){
                 my_json =json;
@@ -60,12 +62,12 @@ function addNodeEntry()
 			var listel = document.createElement("ul");
 			var inlist = document.createElement("li");
 			var light = document.createElement("div");
-			element.style.backgroundColor = '#008811';
+			//element.style.backgroundColor = '#008811';
 			inlist.appendChild(document.createTextNode(thenodes[i].NAME + "  current: "+thenodes[i].WORT));
 			//inlist.appendChild(light);
 			listel.appendChild(inlist);
 			element.appendChild(listel);
-			element.className = "listodd";
+			element.className = "listgood";
 			element.id = thenodes[i].ID;
 			//element.addEventListener("click", choosenode(1), false);
 			//element.onclick = choosenode;
@@ -104,7 +106,8 @@ function startPeriod()
 			if(my_json.status == "ok")
 			{
 				window.alert("Done ok");
-				location.reload();
+				//location.reload();
+				addNodeEntry();
 			}
 			else
 			{
@@ -112,6 +115,7 @@ function startPeriod()
 			}
 		});
 	}
+	$("#NodeInfoModal").modal("hide");
 
 }
 
@@ -129,6 +133,7 @@ function updatenode()
 		{
 			window.alert("Done ok");
 			//location.reload();
+			addNodeEntry();
 		}
 		else
 		{
@@ -141,9 +146,9 @@ function updatenode()
 
 function deletenode()
 {
-	var thisid = document.getElementById('Id').innerHTML;
-	var thisName = document.getElementById('Name').value;
-	var thisip = document.getElementById('Ip').value;
+	var thisid = document.getElementById('Idm').innerHTML;
+	var thisName = document.getElementById('Namem').value;
+	var thisip = document.getElementById('Ipm').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
 	$.getJSON("{{url_for('delNode')}}?node="+thisid,function(json){
@@ -158,6 +163,8 @@ function deletenode()
 		{
 			window.alert("error"+my_json.status);
 		}
+		$("#NodeInfoModal").modal("hide");
+
 	});
 }
 function addnode()
@@ -180,6 +187,8 @@ function addnode()
 		{
 			window.alert("error"+my_json.status);
 		}
+		$("#newNodeModal").modal("hide");
+
 	});
 }
 </script>
@@ -197,6 +206,7 @@ function addnode()
 
 
 <div class='left'>
+<!--
 Id<br>
 <div id='Id' class='displayer' ></div><br>
 <p>Ip</p>
@@ -207,13 +217,14 @@ Id<br>
 <input type='text' id='Setpoint' class='displayertext' ><br>
 <p>Time</p>
 <input type='text' id='bTime' class='displayertext' ><br>
-
+-->
 </div>
+
 <div class='top'>
  <ul>
   <li><a href="{{url_for('thelogout')}}">History</a></li>
-  <li><a href="{{url_for('mNodes')}}">Manage</a></li>
-  <li><a href="{{url_for('theAbout')}}">Schedule</a></li>
+  <li><a href="{{url_for('mNodes')}}">Nodes</a></li>
+  <li><a href="{{url_for('theAbout')}}">Sched</a></li>
 </ul>
 </div>
 
@@ -284,11 +295,11 @@ addNodeEntry();
 	  </div>
  </div>
  <button type="button" class="button" data-toggle="modal" data-target="#newNodeModal">New Node</button> 
-
+<!--
 <button class='button'  onclick=updatenode() name='update' id='updater'>Update</button>
 <button class='button' onclick=addnode() name='update' id='adder'>Add</button>
 <button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button><br>
-<button class='button'  onclick=startPeriod() name='update' id='adder'>Start</button>
+<button class='button'  onclick=startPeriod() name='update' id='adder'>Start</button>-->
 <button class='button'  onclick=addNodeEntry() name='update' id='adder'>Refresh</button>
 </div>
 

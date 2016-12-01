@@ -15,10 +15,9 @@
 
 <link type="text/css" rel="stylesheet" media="screen and (min-device-width: 800px)" href="{{url_for('static',filename="iot.css")}}" />
 <link type="text/css" rel="stylesheet" media="screen and (max-device-width: 800px)" href="{{url_for('static',filename="iotsm.css")}}" />
-
  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 function choosenode(theid)
 {
@@ -26,13 +25,13 @@ function choosenode(theid)
     var my_json = "";
         $.getJSON("{{url_for('getNdata')}}?node="+theid,function(json){
                 my_json =json;
-                $("#Id").text(my_json.Id);
-                 $("#Ip").val(my_json.IP);
-		$("#Name").val(my_json.name);
-		$("#Setpoint").val(my_json.setp);
-		$("#bTime").val(my_json.brewfor);
+                $("#Idm").text(my_json.Id);
+                 $("#Ipm").val(my_json.IP);
+		$("#Namem").val(my_json.name);
+		$("#Setpointm").val(my_json.setp);
+		$("#bTimem").val(my_json.brewfor);
                 });
-
+		$("#newNodeModal").modal("show");
 
 }
 
@@ -42,12 +41,13 @@ function chooseitem(theid)
     var my_json = "";
         $.getJSON("{{url_for('getSdata')}}?node="+theid,function(json){
                 my_json =json;
-                $("#Id").text(my_json.uid);
-                 //$("#Ip").val(my_json.IP);
-		//$("#Name").val(my_json.name);
-		$("#Setpoint").val(my_json.temp);
-		//$("#bTime").val(my_json.brewfor);
+                $("#IdI").text(my_json.uid);
+                 $("#daysI").val(my_json.days);
+		$("#nameI").val(my_json.name);
+		$("#SetpointI").val(my_json.temp);
+		$("#hoursI").val(my_json.hours);
                 });
+		$("#NodeInfoModal").modal("show");
 
 
 }
@@ -77,7 +77,7 @@ function readitems()
 				inlist.className = "tt";
 				listel.appendChild(inlist);
 				element.appendChild(listel);
-				element.className = "listodd";
+				element.className = "listgood";
 				element.id = theitems[i].uid;
 				element.setAttribute("onclick", "chooseitem(" + theitems[i].uid +")");
 
@@ -88,7 +88,8 @@ function readitems()
 		}
 		else
 		{
-			window.alert("nothing to do");
+			//window.alert("nothing to do");
+			//$("#newNodeModal").modal("show");
 		}
 	});
 }
@@ -96,10 +97,10 @@ function readitems()
 
 function additem()
 {
-	var nodeid = document.getElementById('node').value;
-	var thisSetpoint = document.getElementById('Setpoint').value;
-	var thisdays = document.getElementById('days').value;
-	var thishours = document.getElementById('hours').value;
+	var nodeid = document.getElementById('nodem').value;
+	var thisSetpoint = document.getElementById('Setpointm').value;
+	var thisdays = document.getElementById('daysm').value;
+	var thishours = document.getElementById('hoursm').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
 	$.getJSON("{{url_for('Action')}}?node="+nodeid+"&days="+thisdays+"&hours="+thishours+"&temp="+thisSetpoint,function(json){
@@ -115,11 +116,12 @@ function additem()
 			window.alert("error"+my_json.status);
 		}
 	});
+	$("#newNodeModal").modal("hide");
 }
 
 function deletenode()
 {
-	var thisid = document.getElementById('Id').innerHTML;
+	var thisid = document.getElementById('IdI').innerHTML;
 	//var thisName = document.getElementById('Name').value;
 	//var thisip = document.getElementById('Ip').value;
 	//window.alert(thisid+thisName+thisip);
@@ -135,14 +137,15 @@ function deletenode()
 		{
 			window.alert("error"+my_json.status);
 		}
+		$("#NodeInfoModal").modal("hide");
 	});
 }
 function addnode()
 {
-	var thisid = document.getElementById('Id').innerHTML;
-	var thisName = document.getElementById('Name').value;
-	var thisip = document.getElementById('Ip').value;
-	var thisSet = document.getElementById('Setpoint').value;
+	var thisid = document.getElementById('Idm').innerHTML;
+	var thisName = document.getElementById('Namem').value;
+	var thisip = document.getElementById('Ipm').value;
+	var thisSet = document.getElementById('Setpointm').value;
 	//window.alert(thisid+thisName+thisip);
 	var my_json = "";
 	$.getJSON("{{url_for('newNode')}}?name="+thisName+"&Ip="+thisip+"&setp="+thisSet,function(json){
@@ -160,8 +163,8 @@ function addnode()
 }
 function copyover()
 {
-	var theNode = document.getElementById('nodes').value;
-	document.getElementById('node').value = theNode;
+	var theNode = document.getElementById('nodesm').value;
+	document.getElementById('nodem').value = theNode;
 	
 }
 
@@ -214,17 +217,96 @@ Id<br>
 
 <div class='main'>
 <div class= 'graph' id='board'>
-<div class='tabletop'>
-<ul><li class='tt'>Id </li>  <!-- <li class='tt'>  Setpoint </li>-->  <li class='tt'> Name </li> <!-- <li class='tt'>  address</li>--><ul>
+
+
+
+<div class="modal fade" id="newNodeModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<H2>New item</H2>
+			</div>
+			<div class="modal-body">
+				Id<br>
+				<div id='Idm' class='displayer' ></div><br>
+				<p>Node</p>
+				<input type="text" id='nodem' class='displayertext' ><br>
+				
+				<select class='button' name="nodes" id="nodesm" onchange="copyover()">
+					{%for row in allnodes%}
+					<option value='{{row[0]}}'>{{row[1]}}</option>
+					{% endfor %}
+				</select><br>
+				
+				
+				<p>Setpoint</p>
+				<input type='text' id='Setpointm' class='displayertext' ><br>
+				<p>Days</p>
+				<input type='text' id='daysm' class='displayertext' ><br>
+				<p>Hours</p>
+				<input type='text' id='hoursm' class='displayertext' ><br>
+
+
+					
+			
+
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="button" data-dismiss="modal">Cancel</button>
+				<button class='button'  onclick=additem() name='update' id='updater'>Add</button>
+				<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
+			</div>
+
+		</div
+		
+	</div>
+
+</div>
+</div>
+
+<div class="modal fade" id="NodeInfoModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<H2>Item Info</H2>
+			</div>
+			<div class="modal-body">
+				Id<br>
+				<div id='IdI' class='displayer' ></div><br>
+				<p>Node</p>
+				<input type="text" id='nameI' class='displayertext' ><br>
+				
+				<p>Setpoint</p>
+				<input type='text' id='SetpointI' class='displayertext' ><br>
+				<p>Days</p>
+				<input type='text' id='daysI' class='displayertext' ><br>
+				<p>Hours</p>
+				<input type='text' id='hoursI' class='displayertext' ><br>
+
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="button" data-dismiss="modal">Cancel</button>
+				<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
+			</div>
+
+		</div>
+		
+	</div>
+
 </div>
 
 
+
+
+
 </div>
-<button class='button'  onclick=additem() name='update' id='updater'>Add</button>
-<button class='button'  onclick=deletenode() name='update' id='adder'>Delete</button>
+
+<button type="button" class="button" data-toggle="modal" data-target="#newNodeModal">Add</button>
 <button class='button'  onclick=readitems() name='update' id='adder'>Refresh</button>
 
-</div>
+
 
 
 

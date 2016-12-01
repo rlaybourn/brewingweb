@@ -86,6 +86,15 @@ def newNode():
 	except Exception as e:
 		return str(e)
 		
+@app.route('/plaingraph',methods=['POST','GET'])
+def plaingraph():
+    try:
+         whichNode = request.args.get("node")
+         if(whichNode == None):
+             whichNode = 1;
+         return render_template('rawchart.html',node = whichNode)
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/update',methods=['POST','GET'])
@@ -188,11 +197,12 @@ def getSdata():
             return jsonify(items = 0)
         con = mdb.connect('localhost','root','banaka','brewing')
         cur = con.cursor()
-        cur.execute("select node_id,newtemperature,uid from schedules where uid = %d" % int(whichNode))
+        #cur.execute("select node_id,newtemperature,uid from schedules where uid = %d" % int(whichNode))
+        cur.execute("select schedules.node_id,schedules.newtemperature,schedules.uid,nodes.name,(time_to_sec(timediff(schedules.acttime,now()))%% 86400)/3600 as hours,datediff(schedules.acttime,now()) - 1 as days from schedules join nodes on schedules.node_id = nodes.node_id where uid = %d" % int(whichNode))
         res = cur.fetchone()
         cur.close()
         con.close()
-        return jsonify(Id = res[0],temp = res[1],uid = res[2],items = len(res))
+        return jsonify(Id = res[0],temp = res[1],uid = res[2],name = res[3],hours = str(res[4]),days = str(res[5]),items = len(res))
     except Exception as e:
         return str(e)
 
@@ -315,15 +325,44 @@ def rawdata():
 			whichNode = 1
 		con = mdb.connect('localhost','root','banaka','brewing')
 		cur = con.cursor()
-		cur.execute("select wort,ambient,setpoint from templogs where node_id = %d order by thetime desc limit 1" % int(whichNode))
-		res = cur.fetchone()
+                cur.execute("select wort,ambient,setpoint from templogs where node_id = %d order by thetime desc limit 1" % int(whichNode))
+                res = cur.fetchone()
+		#cur.execute("select wort,ambient,setpoint,time_to_sec(timediff(thetime,now()))/3600 from templogs where node_id = %d and thetime > now() - interval 5 hour order by thetime" % int(whichNode))
+		#res = cur.fetchall()
 		cur.close()
 		con.close()
+                #thelist = []
+                #for item in res:
+                #    thelist.append({'wort' : item[0], 'setpoint' : item[2], 'time' : str(item[3])})
 		#list = get_last_row('/var/www/log.csv')
 		#return jsonify(wort = list[1],ambient = list[2],setpoint = list[3])
-		return jsonify(wort = res[0],ambient = res[1],setpoint = res[2])
+		#return jsonify(data = thelist)
+                return jsonify(wort = res[0],ambient = res[1],setpoint = res[2])
 	except Exception as e:
 		return str(e)
+
+@app.route('/rawdata', methods=['POST','GET'])
+def raw():
+	try:
+		whichNode = request.args.get("node")
+		if(whichNode == None):
+			whichNode = 1
+		con = mdb.connect('localhost','root','banaka','brewing')
+		cur = con.cursor()
+		cur.execute("select wort,ambient,setpoint,time_to_sec(timediff(thetime,now()))/3600 from templogs where node_id = %d and thetime > now() - interval 5 hour order by thetime" % int(whichNode))
+		res = cur.fetchall()
+		cur.close()
+		con.close()
+                thelist = []
+                for item in res:
+                    thelist.append({'wort' : item[0], 'setpoint' : item[2], 'time' : str(item[3])})
+		#list = get_last_row('/var/www/log.csv')
+		#return jsonify(wort = list[1],ambient = list[2],setpoint = list[3])
+		return jsonify(data = thelist)
+	except Exception as e:
+		return str(e)
+
+
 @app.route('/nodelist',methods=['POST','GET'])
 def nodeList():
     try:
@@ -331,13 +370,13 @@ def nodeList():
         cur = con.cursor()
 #        cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
 #        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),templogs.wort,templogs.thetime from nodes join templogs on nodes.node_id = templogs.node_id order by itemId desc limit 1")
-        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),t3.wort,t3.thetime from nodes join (select * from templogs join (select node_id id,max(thetime) timestamp from templogs group by node_id) t2 on templogs.thetime = t2.timestamp) t3 on t3.id = nodes.node_id order by nodes.node_id") 
+        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),t3.wort,t3.thetime,TIME_TO_SEC(timediff(now(),t3.thetime)) from nodes join (select * from templogs join (select node_id id,max(thetime) timestamp from templogs group by node_id) t2 on templogs.thetime = t2.timestamp) t3 on t3.id = nodes.node_id order by nodes.node_id") 
         res = cur.fetchall()
         cur.close()
         con.close()
         thelist = []
         for item in res:
-            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5],'WORT' : item[6]})
+            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5],'WORT' : item[6],'LastUpdate' : item[8]})
         return jsonify(nodes = thelist)
     except Exception as e:
         return str(e)

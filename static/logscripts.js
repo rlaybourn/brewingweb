@@ -75,7 +75,7 @@ function drawVisualization() {
         {
                 cols.push(2);
         }
-	cols.push(4);
+	//cols.push(4);
 	console.log(cols);
         view.setColumns(cols);
  // Create a dashboard.
@@ -170,7 +170,7 @@ function redrawVisualization() {
         var el = document.getElementById('setp');
         var am = document.getElementById('amb');
       view = new google.visualization.DataView(data);
-        var cols = [0,1,4];
+        var cols = [0,1];
         if(el.checked)
         {
                 cols.push(3);

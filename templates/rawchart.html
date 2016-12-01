@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+ <!-- http://t.co/dKP3o1e -->
+ <meta name="HandheldFriendly" content="True">
+ <meta name="MobileOptimized" content="320">
+
+ <title>Beer Tracker</title>
+ <meta name="description" content="test">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='iot.css') }}" />
+<style>
+
+</style>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script src="jquery.csv.min.js"></script>
+ <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+ <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+<script type="text/javascript"> // load the visualisation API
+  google.load('visualization', '1', { packages: ['corechart', 'controls'] });
+</script>
+<!--<script type="text/javascript" src={{url_for('static',filename='logscripts.js')}}></script>-->
+<script type="text/javascript">
+
+ google.load('visualization', '1', { packages: ['corechart', 'controls'] });
+
+//google.charts.setOnLoadCallback(drawVisualization);
+google.charts.setOnLoadCallback(justGraph);
+
+
+function logout()
+{
+	try{
+	$.getJSON("{{url_for('logout')}}");
+	}
+	catch(e2)
+	{
+		return
+	}
+	console.log("logged out");
+	window.setTimeout(refresh(),2000);
+	return
+}
+
+function justGraph(){
+        console.log("drawing");
+        //var e = document.getElementById("Period");
+        var strUser = 2;//e.options[e.selectedIndex].value;
+        //var nd = document.getElementById("nodes");
+	var theNode = {{node}};//nd.options[nd.selectedIndex].value;
+        console.log("data?days=" + strUser+"&node=" + theNode);
+       jsonData = $.ajax({
+          //url: "index.py/data",
+          url: "data?days=" + strUser+"&node=" + theNode,
+          dataType:"json",
+          async: false
+          }).responseText;
+      // this new DataTable object holds all the data
+       data = new google.visualization.DataTable(jsonData,0.6);
+        //var el = document.getElementById('setp');
+        //var am = document.getElementById('amb');
+      view = new google.visualization.DataView(data);
+        var cols = [0,1];
+        console.log(cols);
+        view.setColumns(cols);
+
+
+	var chart = new google.visualization.LineChart(document.getElementById('crt_ertdlyYY'));
+	chart.draw(view);
+
+}
+
+
+                                            
+</script>
+<body>
+<div id="crt_ertdlyYY" class="graph"></div>
+{{node}}
+</body>
+<html>
