@@ -63,11 +63,16 @@ function addNodeEntry()
 			var inlist = document.createElement("li");
 			var light = document.createElement("div");
 			//element.style.backgroundColor = '#008811';
-			inlist.appendChild(document.createTextNode(thenodes[i].NAME + "  current: "+thenodes[i].WORT));
+			inlist.appendChild(document.createTextNode(thenodes[i].NAME + "  current: "+thenodes[i].WORT + " age: "+thenodes[i].LAST));
 			//inlist.appendChild(light);
 			listel.appendChild(inlist);
 			element.appendChild(listel);
-			element.className = "listgood";
+			if(parseInt(thenodes[i].LAST) < 500){
+				element.className = "listgood";
+			}
+			else{
+			element.className = "listbad";
+				}
 			element.id = thenodes[i].ID;
 			//element.addEventListener("click", choosenode(1), false);
 			//element.onclick = choosenode;

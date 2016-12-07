@@ -54,6 +54,7 @@ function drawVisualization() {
         var strUser = e.options[e.selectedIndex].value;
         var nd = document.getElementById("nodes");
         var theNode = nd.options[nd.selectedIndex].value;
+	console.log(theNode);
         console.log("data?days=" + strUser+"&node=" + theNode);
        jsonData = $.ajax({
           //url: "index.py/data",

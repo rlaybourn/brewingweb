@@ -370,13 +370,25 @@ def nodeList():
         cur = con.cursor()
 #        cur.execute("select node_id,setpoint,name,ip,switches,datediff( now() , brewstart) from nodes order by node_id")
 #        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),templogs.wort,templogs.thetime from nodes join templogs on nodes.node_id = templogs.node_id order by itemId desc limit 1")
-        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),t3.wort,t3.thetime,TIME_TO_SEC(timediff(now(),t3.thetime)) from nodes join (select * from templogs join (select node_id id,max(thetime) timestamp from templogs group by node_id) t2 on templogs.thetime = t2.timestamp) t3 on t3.id = nodes.node_id order by nodes.node_id") 
+#        cur.execute("select nodes.node_id,nodes.setpoint,nodes.name,nodes.ip,nodes.switches,datediff( now() , nodes.brewstart),t3.wort,t3.thetime,TIME_TO_SEC(timediff(now(),t3.thetime)) from nodes join (select * from templogs join (select node_id id,max(thetime) timestamp from templogs group by node_id) t2 on templogs.thetime = t2.timestamp) t3 on t3.id = nodes.node_id order by nodes.node_id") 
+        cur.execute("select node_id,setpoint,name,ip,switches,datediff(now(), brewstart) from nodes order by node_id")
         res = cur.fetchall()
+        cur.execute("select * from (select node_id,wort from templogs order by thetime desc limit 2) t2 order by node_id")
+        res2 = cur.fetchall()
+        lastreading = []
+        for i in range(10):
+            lastreading.append(0)
+        for thisnode in res:
+            cur.execute("select now() - (select thetime from templogs where node_id = %s order by thetime desc limit 1)" % (thisnode[0]))
+            res3 = cur.fetchone()
+            lastreading[int(thisnode[0])] = res3[0]
         cur.close()
         con.close()
         thelist = []
+        counter = 0
         for item in res:
-            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5],'WORT' : item[6],'LastUpdate' : item[8]})
+            thelist.append({'ID' : item[0],'NAME' : item[2],'SETPOINT' : item[1], 'IP' : item[3], 'DURATION' : item[5],'WORT' : res2[counter][1],'LAST' : lastreading[counter +1]})
+            counter = counter + 1
         return jsonify(nodes = thelist)
     except Exception as e:
         return str(e)
@@ -418,8 +430,8 @@ def set():
 	
 @app.route('/data', methods=['POST', 'GET'])
 def outdata():
-	period = request.args.get("days")
-	whichNode = request.args.get("node")
+	period = int(request.args.get("days"))
+	whichNode = int(request.args.get("node"))
 	
 	if(period == None):
 		period = 2

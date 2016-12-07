@@ -241,6 +241,19 @@
   width: 100%;
   border-style: solid;
 }
+.listbad{
+ background-color:#600040;
+  height: 30px;
+  width: 100%;
+  border-style: solid;
+
+}
+.listbad:hover{
+ background-color:#800040;
+  height: 30px;
+  width: 100%;
+  border-style: solid;
+}
 
 html, body
 {
