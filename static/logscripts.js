@@ -96,19 +96,30 @@ function drawVisualization() {
       // CAPACITY - En-route ATFM delay - YY - CHART
       var chart = new google.visualization.ChartWrapper({
          chartType: 'LineChart',
+	 //chartType: 'BarChart',
+
+	 //chartType: 'ScatterChart',
          containerId: 'crt_ertdlyYY',
         options:{
             width: '90%', height: '80%',
             title: 'Brewing temperatures-(minutes since midnight)',
             curveType: 'function',
-            titleTextStyle : {color: 'grey', fontSize: 11},
+	    pointSize: 0.001,
+
+	    animation: {
+	    "startup": true,
+      	    duration: 100,
+    	    easing: 'linear'
+    	    },
+
+        titleTextStyle : {color: 'grey', fontSize: 11},
             backgroundColor: '#E4E4E4',
             vAxis: { 
               title: "Temperature", 
               viewWindowMode:'explicit',
               viewWindow:{
                 max:30,
-                min:5
+                min:0
               }
                 
 

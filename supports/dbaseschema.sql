@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: brewing
 -- ------------------------------------------------------
--- Server version	5.7.13-0ubuntu0.16.04.2
+-- Server version	5.7.16-0ubuntu0.16.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,7 +30,9 @@ CREATE TABLE `nodes` (
   `switches` varchar(10) DEFAULT NULL,
   `brewstart` datetime DEFAULT NULL,
   `kp` double DEFAULT NULL,
-  `ki` double DEFAULT NULL
+  `ki` double DEFAULT NULL,
+  `sync` int(11) DEFAULT NULL,
+  `freq` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -48,7 +50,7 @@ CREATE TABLE `schedules` (
   `uid` bigint(20) NOT NULL AUTO_INCREMENT,
   `completed` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`uid`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,7 +69,7 @@ CREATE TABLE `templogs` (
   `setpoint` float DEFAULT NULL,
   `inside` float DEFAULT NULL,
   PRIMARY KEY (`itemId`)
-) ENGINE=InnoDB AUTO_INCREMENT=71272 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=78628 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,4 +95,4 @@ CREATE TABLE `types` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-12-13 13:51:32
+-- Dump completed on 2016-12-23  9:06:47
